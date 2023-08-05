@@ -1,12 +1,12 @@
 import psycopg2
 
 class DatabaseConnection:
-    _instance = None
+    __instance = None
 
     def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
+        if cls.__instance is None:
+            cls.__instance = super().__new__(cls)
+        return cls.__instance
 
     def __init__(self, db_name, user, password, host="localhost", port="5432"):
         self.db_name = db_name
@@ -28,18 +28,32 @@ class DatabaseConnection:
             print(f"Connected to {self.db_name}")
         except psycopg2.Error as e:
             print(f"Error connecting to {self.db_name}: {e}")
-
-    def execute_query(self, query, params=None):
+    def execute_query(self, query, params=None, operation_type="SELECT"):
         try:
             cursor = self.connection.cursor()
+
             if params:
                 cursor.execute(query, params)
             else:
                 cursor.execute(query)
+
             self.connection.commit()
-            print("Query executed successfully.")
+
+            if operation_type == "SELECT":
+                result = cursor.fetchone()
+
+                if result is not None:
+                    return True
+
+                else:
+                    return False
+
+            elif operation_type == "INSERT":
+                return True
+
         except psycopg2.Error as e:
             print(f"Error executing query: {e}")
+
 
     def close(self):
         if self.connection:
@@ -47,14 +61,7 @@ class DatabaseConnection:
             print("Connection closed.")
 
 
-if __name__ == "__main__":
-    # Example usage:
-    db_name = "weatherApp"
-    user = "postgres"
-    password = "admin"
 
-    # Creating the singleton instance
-    db = DatabaseConnection(db_name, user, password)
-    db.connect()
+db = DatabaseConnection("weatherApp", "postgres", "admin")
+db.connect()
 
-    # Rest of the code remains the same...
