@@ -1,8 +1,7 @@
 import click
 from database_connection import db
-
-
-
+from password_handler import hash_password, verify_login
+import base64
 
 class Program:
     pass
@@ -32,21 +31,26 @@ def main():
 
 
 def login():
-    """Function to handle login logic."""
     click.echo("You selected Login.")
 
     while True:
         email = click.prompt("Please enter your email", type=str)
-        password = click.prompt("Please enter your password", type=str)
 
-        query = "SELECT * FROM users WHERE email = %s AND password = %s;"
-        params = (email, password)
+        query = "SELECT * FROM users WHERE email = %s;"
+        params = (email,)
 
-        result = db.execute_query(query, params)
+        result, record = db.execute_query(query, params)
 
         if not result:
-            click.echo("User does not exist. Try again")
+            click.echo("User with given email does not exist. Try again")
             continue
+
+        password = click.prompt("Please enter your password", type=str)
+
+        result = verify_login(password, record[2], record[-1])
+
+        if not result:
+            click.echo("The User does not exist")
 
         #personalization
 
@@ -60,9 +64,9 @@ def register():
         query = "SELECT * FROM users WHERE email = %s;"
         params = (email,)
 
-        exists = db.execute_query(query, params)
+        result, record = db.execute_query(query, params, "SELECT")
 
-        if exists:
+        if result:
             click.echo("Email with that email already exists")
             continue
 
@@ -75,10 +79,13 @@ def register():
 
         rank = click.prompt("Please enter your rank", type=str)
 
-        new_user = "INSERT INTO users(email, password, rank) " \
-                   "VALUES (%s, %s, %s)"
+        hashed_password, salt = hash_password(password)
+        hashed_password = hashed_password.hex()
 
-        params = (email, password, rank)
+        new_user = "INSERT INTO users(email, password, rank, salt) " \
+                   "VALUES (%s, %s, %s, %s)"
+
+        params = (email, hashed_password, rank, salt)
 
         new_user_creation_result = db.execute_query(new_user, params, "INSERT")
 

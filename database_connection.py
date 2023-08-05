@@ -25,9 +25,9 @@ class DatabaseConnection:
                 host=self.host,
                 port=self.port
             )
-            print(f"Connected to {self.db_name}")
         except psycopg2.Error as e:
             print(f"Error connecting to {self.db_name}: {e}")
+
     def execute_query(self, query, params=None, operation_type="SELECT"):
         try:
             cursor = self.connection.cursor()
@@ -43,10 +43,10 @@ class DatabaseConnection:
                 result = cursor.fetchone()
 
                 if result is not None:
-                    return True
+                    return True, result
 
                 else:
-                    return False
+                    return False, result
 
             elif operation_type == "INSERT":
                 return True
@@ -58,8 +58,6 @@ class DatabaseConnection:
     def close(self):
         if self.connection:
             self.connection.close()
-            print("Connection closed.")
-
 
 
 db = DatabaseConnection("weatherApp", "postgres", "admin")
