@@ -1,5 +1,6 @@
 import click
 import sys
+from setup import SetupHub
 
 def setup_or_run():
     click.echo("Run your program or make personalized choices")
@@ -14,9 +15,9 @@ def setup_or_run():
         choice = click.prompt("Enter your choice", type=int)
 
         if choice == 1:
-            pass
+            run()
         elif choice == 2:
-            pass
+            SetupHub.setup()
         elif choice == 3:
             click.echo("Exiting the program. Goodbye!")
             break
@@ -24,10 +25,6 @@ def setup_or_run():
             logout()
         else:
             click.echo("Invalid choice. Please try again.")
-
-
-def setup():
-    pass
 
 
 def run():

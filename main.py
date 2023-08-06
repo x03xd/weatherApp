@@ -1,12 +1,16 @@
 import click
-from authentication import login, register, is_user_logged
+from authentication import Authentication
+from data_text import is_user_logged
+from main2 import setup_or_run
 
 @click.command()
 def main():
     click.echo("Welcome to the program!")
-    is_user_logged()
 
     while True:
+        if is_user_logged():
+            setup_or_run()
+
         click.echo("\nPlease select an option:")
         click.echo("1. Login")
         click.echo("2. Register")
@@ -15,19 +19,14 @@ def main():
         choice = click.prompt("Enter your choice", type=int)
 
         if choice == 1:
-            login()
+            Authentication.login()
         elif choice == 2:
-            register()
+            Authentication.register()
         elif choice == 3:
             click.echo("Exiting the program. Goodbye!")
             break
         else:
             click.echo("Invalid choice. Please try again.")
-
-
-
-
-
 
 
 
