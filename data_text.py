@@ -23,9 +23,9 @@ def is_user_logged():
         query = """SELECT * FROM users WHERE email = %s AND password = %s"""
         params = (email, hashed_password)
 
-        result = db.execute_query(query, params, "SELECT")
+        result, record = db.execute_query(query, params, "SELECT")
 
-        return bool(result)
+        return result
 
 def get_credentials():
     return read_credentials() if is_user_logged() else None

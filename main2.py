@@ -4,6 +4,7 @@ from setup import SetupHub
 
 def setup_or_run():
     click.echo("Run your program or make personalized choices")
+    setup_instance = SetupHub()
 
     while True:
         click.echo("\nPlease select an option:")
@@ -17,7 +18,7 @@ def setup_or_run():
         if choice == 1:
             run()
         elif choice == 2:
-            SetupHub.setup()
+            setup_instance.setup()
         elif choice == 3:
             click.echo("Exiting the program. Goodbye!")
             break

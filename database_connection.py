@@ -49,7 +49,10 @@ class DatabaseConnection:
                     return False, result
 
             elif operation_type == "INSERT":
-                print("insert")
+                return True
+
+            elif operation_type == "UPDATE":
+                print("updated")
                 return True
 
         except psycopg2.Error as e:

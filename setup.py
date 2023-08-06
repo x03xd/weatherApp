@@ -6,36 +6,86 @@ from database_connection import db
 class SetupHub:
 
     cities = []
+    hour = []
+    email = None
 
+    @classmethod
     def setup(cls):
 
-        email, hashed_password = get_credentials()
+        cls.email, hashed_password = get_credentials()
+
         hour = click.prompt("Please enter an hour", type=str)
 
-        query = """SELECT hour, cities FROM timers WHERE user_email = %s AND hour = %s"""
-        params = (email, hour)
+        query = """SELECT cities FROM timers WHERE user_email = %s AND hour = %s"""
+        params = (cls.email, hour)
 
         result, record = db.execute_query(query, params, "SELECT")
-        hour_, SetupHub.cities = record
 
+        if result is False:
+            query_insert = """INSERT INTO timers(hour, user_email, cities)
+                    VALUES(%s, %s, %s);"""
+
+            params_insert = (hour, cls.email, [])
+            db.execute_query(query_insert, params_insert, "INSERT")
+
+            cls.cities = []
+
+        cls.cities = record[0]
+        cls.hour = hour
+
+        cls.interface()
+
+
+
+    @classmethod
+    def interface(cls):
         click.echo("You can either provide new city typing its name or remove existing doing the same things")
-        click.echo(f"Hour: {hour_}, Cities: {SetupHub.cities}")
+        click.echo(f"Hour: {cls.hour}, Cities: {cls.cities}")
 
         city = click.prompt("Enter a city")
-
-        if city in SetupHub.cities:
-            SetupHub.remove_city(city)
-
-
-    def remove_city(cls, city):
         city = city.lower()
 
-        if city in SetupHub.cities:
-            SetupHub.remove(city)
-            
+        if city in cls.cities:
+            cls.remove_city(city)
 
-    def add(cls, city):
-        pass
+        else:
+            cities_length = len(cls.cities)
+
+            if cities_length >= 3:
+                click.echo("You cannot add new city (limit equals 3)")
+                cls.interface()
+
+            else:
+                cls.add_city(city)
+
+
+    @classmethod
+    def remove_city(cls, city):
+
+        if city in cls.cities:
+            query = """UPDATE timers SET cities = ARRAY_REMOVE(cities, %s) WHERE user_email = %s;"""
+            params = (city, cls.email)
+
+            db.execute_query(query, params, "UPDATE")
+            cls.cities.remove(city)
+
+        cls.interface()
+
+
+    @classmethod
+    def add_city(cls, city):
+
+        if city in cls.cities:
+            click.echo("Given city is already in your choices")
+
+        else:
+            query = """UPDATE timers SET cities = ARRAY_APPEND(cities, %s) WHERE user_email = %s;"""
+            params = (city, cls.email)
+
+            db.execute_query(query, params, "UPDATE")
+            cls.cities.append(city)
+
+        cls.interface()
 
 
 
