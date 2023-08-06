@@ -2,7 +2,6 @@ import click
 from data_text import get_credentials
 from database_connection import db
 
-
 class SetupHub:
 
     cities = []
@@ -32,7 +31,6 @@ class SetupHub:
 
         cls.cities = record[0]
         cls.hour = hour
-
         cls.interface()
 
 
