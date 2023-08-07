@@ -5,7 +5,7 @@ from database_connection import db
 class SetupHub:
 
     cities = []
-    hour = []
+    hour = None
     email = None
 
     @classmethod
@@ -34,7 +34,6 @@ class SetupHub:
         cls.interface()
 
 
-
     @classmethod
     def interface(cls):
         click.echo("You can either provide new city typing its name or remove existing doing the same things")
@@ -61,8 +60,8 @@ class SetupHub:
     def remove_city(cls, city):
 
         if city in cls.cities:
-            query = """UPDATE timers SET cities = ARRAY_REMOVE(cities, %s) WHERE user_email = %s;"""
-            params = (city, cls.email)
+            query = """UPDATE timers SET cities = ARRAY_REMOVE(cities, %s) WHERE user_email = %s AND hour = %s;"""
+            params = (city, cls.email, cls.hour)
 
             db.execute_query(query, params, "UPDATE")
             cls.cities.remove(city)
@@ -77,8 +76,8 @@ class SetupHub:
             click.echo("Given city is already in your choices")
 
         else:
-            query = """UPDATE timers SET cities = ARRAY_APPEND(cities, %s) WHERE user_email = %s;"""
-            params = (city, cls.email)
+            query = """UPDATE timers SET cities = ARRAY_APPEND(cities, %s) WHERE user_email = %s AND hour = %s;"""
+            params = (city, cls.email, cls.hour)
 
             db.execute_query(query, params, "UPDATE")
             cls.cities.append(city)

@@ -11,28 +11,38 @@ class Authentication:
         click.echo("You selected Login.")
 
         while True:
-            email = click.prompt("Please enter your email", type=str)
+            request = click.prompt("Do you wanna back to the main menu? Y/N", type=str)
 
-            query = """SELECT * FROM users WHERE email = %s;"""
-            params = (email,)
+            if request.upper() == "Y":
+                break
 
-            result, record = db.execute_query(query, params)
+            elif request.upper() == "N":
 
-            if not result:
-                click.echo("User with given email does not exist. Try again")
-                continue
+                email = click.prompt("Please enter your email", type=str)
 
-            password = click.prompt("Please enter your password", type=str)
+                query = """SELECT * FROM users WHERE email = %s;"""
+                params = (email,)
 
-            result = verify_login(password, record[2], record[-1])
+                result, record = db.execute_query(query, params)
 
-            if result:
-                click.echo("You have been logged in")
-            else:
-                click.echo("The User does not exist")
+                if not result:
+                    click.echo("User with given email does not exist. Try again")
+                    continue
 
-            save_user_to_file(email, record[2])
-            setup_or_run()
+                password = click.prompt("Please enter your password", type=str)
+
+                result = verify_login(password, record[2], record[-1])
+
+                if result:
+                    click.echo("You have been logged in")
+                    save_user_to_file(email, record[2])
+                    setup_or_run()
+
+                else:
+                    click.echo("The User does not exist")
+
+
+
 
 
     @staticmethod
@@ -40,50 +50,57 @@ class Authentication:
         click.echo("You selected Register.")
 
         while True:
-            email = click.prompt("Please enter your email", type=str)
-            query = """SELECT * FROM users WHERE email = %s;"""
+            request = click.prompt("Do you wanna back to the main menu? Y/N", type=str)
 
-            email_validation = is_valid_email(email)
+            if request.upper() == "Y":
+                break
 
-            if not email_validation:
-                click.echo("Email has wrong structure")
-                continue
+            elif request.upper() == "N":
 
-            params = (email,)
-            result, record = db.execute_query(query, params, "SELECT")
+                email = click.prompt("Please enter your email", type=str)
+                query = """SELECT * FROM users WHERE email = %s;"""
 
-            if result:
-                click.echo("Email with that email already exists")
-                continue
+                email_validation = is_valid_email(email)
 
-            password = click.prompt("Please enter your password", type=str)
-            password2 = click.prompt("Please enter your password again", type=str)
+                if not email_validation:
+                    click.echo("Email has wrong structure")
+                    continue
 
-            if password != password2:
-                click.echo("Given passwords are not equal")
-                continue
+                params = (email,)
+                result, record = db.execute_query(query, params, "SELECT")
 
-            password_validation = is_valid_password(password)
+                if result:
+                    click.echo("Email with that email already exists")
+                    continue
 
-            if not password_validation:
-                click.echo("Password must contain at least 8 characters,"
-                           " one uppercase, one lowercase, one digit, and one special character")
-                continue
+                password = click.prompt("Please enter your password", type=str)
+                password2 = click.prompt("Please enter your password again", type=str)
 
-            hashed_password, salt = hash_password(password)
-            hashed_password = hashed_password.hex()
+                if password != password2:
+                    click.echo("Given passwords are not equal")
+                    continue
 
-            new_user = "INSERT INTO users(email, password, salt) " \
-                       "VALUES (%s, %s, %s)"
+                password_validation = is_valid_password(password)
 
-            params = (email, hashed_password, salt)
-            new_user_creation_result = db.execute_query(new_user, params, "INSERT")
+                if not password_validation:
+                    click.echo("Password must contain at least 8 characters,"
+                               " one uppercase, one lowercase, one digit, and one special character")
+                    continue
 
-            if new_user_creation_result:
-                click.echo("New user has been created")
-            else:
-                click.echo("Something went wrong")
+                hashed_password, salt = hash_password(password)
+                hashed_password = hashed_password.hex()
 
-            save_user_to_file(email, hashed_password)
-            setup_or_run()
+                new_user = "INSERT INTO users(email, password, salt) " \
+                           "VALUES (%s, %s, %s)"
+
+                params = (email, hashed_password, salt)
+                new_user_creation_result = db.execute_query(new_user, params, "INSERT")
+
+                if new_user_creation_result:
+                    click.echo("New user has been created")
+                else:
+                    click.echo("Something went wrong")
+
+                save_user_to_file(email, hashed_password)
+                setup_or_run()
 
