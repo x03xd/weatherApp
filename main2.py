@@ -6,7 +6,7 @@ from run import HourlyScheduler
 def setup_or_run():
     click.echo("Run your program or make personalized choices")
     setup_instance = SetupHub()
-    run = HourlyScheduler()
+    start = HourlyScheduler()
 
     while True:
         click.echo("\nPlease select an option:")
@@ -18,7 +18,7 @@ def setup_or_run():
         choice = click.prompt("Enter your choice", type=int)
 
         if choice == 1:
-            HourlyScheduler.run()
+            start.run()
         elif choice == 2:
             setup_instance.setup()
         elif choice == 3:

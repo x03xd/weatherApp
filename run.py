@@ -3,10 +3,11 @@ from database_connection import db
 import requests
 import schedule
 import time
-import ctypes
+from window import create_notification
+import click
+
 
 class HourlyScheduler:
-
     email = None
 
     @classmethod
@@ -17,13 +18,22 @@ class HourlyScheduler:
         query = """SELECT cities FROM timers WHERE user_email = %s AND hour = %s"""
         params = (cls.email, hour)
 
-        cities = db.execute_query(query, params)
+        result, cities = db.execute_query(query, params)
 
-        for city in cities:
-            url = f"http://api.openweathermap.org/data/2.5/weather?appid={key}&q={city}"
-            response = requests.get(url).json()
-            print(response)
+        if result:
+            for city in cities[0]:
+                url = f"http://api.openweathermap.org/data/2.5/weather?appid={key}&q={city}&units=metric"
 
+                try:
+                    response = requests.get(url).json()
+                    create_notification(response, city)
+
+                except Exception as e:
+                    click.echo(f"Error fetching weather data for '{city}': {e}")
+                    return None
+
+        else:
+            click.echo("There are no cities for current hour")
 
     @classmethod
     def run(cls):
@@ -35,5 +45,5 @@ class HourlyScheduler:
             time.sleep(1)
 
 
-
-
+if __name__ == "__main__":
+    HourlyScheduler().get_request()

@@ -36,7 +36,8 @@ class SetupHub:
 
     @classmethod
     def interface(cls):
-        click.echo("You can either provide new city typing its name or remove existing doing the same things")
+        click.echo("You can either provide new city typing its name or remove existing doing the same things"
+                   "If you provide not existing city you will receive info about this in the console while good ones will be shown")
         click.echo(f"Hour: {cls.hour}, Cities: {cls.cities}")
 
         city = click.prompt("Enter a city")
