@@ -38,12 +38,15 @@ class HourlyScheduler:
     @classmethod
     def run(cls):
         cls.email = get_credentials()[0]
+
+        query = """SELECT minutes FROM timers WHERE user_email = s%;"""
+
+
         schedule.every().hour.at(":00").do(cls.get_request)
 
         while True:
             schedule.run_pending()
             time.sleep(1)
-
 
 if __name__ == "__main__":
     HourlyScheduler().get_request()

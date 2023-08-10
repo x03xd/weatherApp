@@ -11,7 +11,6 @@ class Authentication:
         click.echo("You selected Login.")
 
         while True:
-
             email = click.prompt("Please enter your email", type=str)
 
             query = """SELECT * FROM users WHERE email = %s;"""
@@ -41,7 +40,6 @@ class Authentication:
         click.echo("You selected Register.")
 
         while True:
-
             email = click.prompt("Please enter your email", type=str)
             query = """SELECT * FROM users WHERE email = %s;"""
 
@@ -75,8 +73,7 @@ class Authentication:
             hashed_password, salt = hash_password(password)
             hashed_password = hashed_password.hex()
 
-            new_user = "INSERT INTO users(email, password, salt) " \
-                    "VALUES (%s, %s, %s)"
+            new_user = """INSERT INTO users(email, password, salt) VALUES (%s, %s, %s)"""
 
             params = (email, hashed_password, salt)
             new_user_creation_result = db.execute_query(new_user, params, "INSERT")
