@@ -12,6 +12,7 @@ def create_notification(response, city):
     notification_height = 150
 
     notification.geometry(f"{notification_width}x{notification_height}")
+    notification.attributes("-topmost", True)
     notification.after(5000, notification.destroy)
 
     city_name_label = tk.Label(notification, text=city, font=("Helvetica", 16, "bold"))

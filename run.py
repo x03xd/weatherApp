@@ -39,10 +39,13 @@ class HourlyScheduler:
     def run(cls):
         cls.email = get_credentials()[0]
 
-        query = """SELECT minutes FROM timers WHERE user_email = s%;"""
+        query = """SELECT minutes FROM users WHERE email = %s"""
+        params = (cls.email,)
 
+        result, minutes = db.execute_query(query, params)
 
-        schedule.every().hour.at(":00").do(cls.get_request)
+        for minute_timer in minutes[0]:
+            schedule.every().hour.at(f":{minute_timer}").do(cls.get_request)
 
         while True:
             schedule.run_pending()
