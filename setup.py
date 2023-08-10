@@ -5,10 +5,8 @@ import bisect
 
 class SetupHub:
 
-    cities = []
-    hour = None
-    email = None
-    minutes = []
+    cities, minutes = [], []
+    hour, email = None, None
 
     @classmethod
     def setup(cls):
@@ -18,9 +16,11 @@ class SetupHub:
         while True:
 
             click.echo("\nPlease select an option:")
-            click.echo("1. Change cities based on hour")
-            click.echo("2. Change minutes")
-            click.echo("3. Exit")
+            click.echo("1. Change cities list for specific hour")
+            click.echo("2. Change minutes for display hours")
+            click.echo("3. Restart list of cities for every hour")
+            click.echo("4. Restart minutes timers")
+            click.echo("5. Exit")
 
             choice = click.prompt("Enter your choice", type=int)
 
@@ -29,34 +29,54 @@ class SetupHub:
             elif choice == 2:
                 cls.minutes()
             elif choice == 3:
+                cls.restart_cities()
+            elif choice == 4:
+                cls.restart_minutes_timers()
+            elif choice == 5:
                 click.echo("Exiting the program. Goodbye!")
                 break
             else:
                 click.echo("Invalid choice. Please try again.")
 
+    @classmethod
+    def restart_cities(cls):
+        query = """UPDATE timers SET cities = '{}' WHERE user_email = %s;"""
+        params = (cls.email,)
+        db.execute_query(query, params, "UPDATE")
+        click.echo("Cities have been removed.")
+
+    @classmethod
+    def restart_minutes_timers(cls):
+        query = """UPDATE users SET minutes = '{}' WHERE email = %s;"""
+        params = (cls.email,)
+        db.execute_query(query, params, "UPDATE")
+        click.echo("Minutes timers have been removed.")
 
     @classmethod
     def hours(cls):
-        hour = click.prompt("Please enter an hour", type=str)
+        while True:
+            hour = click.prompt("Please enter an hour", type=str)
 
-        query = """SELECT cities FROM timers WHERE user_email = %s AND hour = %s"""
-        params = (cls.email, hour)
+            if "0" <= hour <= "23":
+                click.echo("The input must have range <0, 23>")
+                continue
 
-        result, record = db.execute_query(query, params, "SELECT")
+            query = """SELECT cities FROM timers WHERE user_email = %s AND hour = %s"""
+            params = (cls.email, hour)
 
-        if result is False:
-            query_insert = """INSERT INTO timers(hour, user_email, cities)
-                            VALUES(%s, %s, %s);"""
+            result, record = db.execute_query(query, params, "SELECT")
 
-            params_insert = (hour, cls.email, [])
-            db.execute_query(query_insert, params_insert, "INSERT")
+            if record is None:
+                query_insert = """INSERT INTO timers(hour, user_email, cities) VALUES(%s, %s, %s);"""
 
-            cls.cities = []
+                params_insert = (hour, cls.email, [])
+                db.execute_query(query_insert, params_insert, "INSERT")
 
-        cls.cities = record[0]
-        cls.hour = hour
-        cls.interface()
+                cls.cities = []
 
+            cls.cities = record[0] if record is not None else []
+            cls.hour = hour
+            cls.interface()
 
     @classmethod
     def querying_minutes(cls):
@@ -72,34 +92,35 @@ class SetupHub:
         click.echo(f"Minutes: {cls.minutes}")
 
         while True:
-            minutes = click.prompt("Add unique minute timer in which the notification should be displayed. Range <0, 59>.", type=str)
+            minutes = click.prompt("Add minute timer in which the notification should be displayed."
+                                   " Range <0, 59>. If it already exists, it will be removed", type=str)
 
             if not minutes.isdigit() or len(minutes) > 2 or len(minutes) == 0:
-                click.echo("Input is not accepted because of characters other than numbers. Try again.")
+                click.echo("The input is not accepted because of characters other than numbers. Try again.")
                 continue
 
             if 0 > int(minutes) > 60:
-                click.echo("Input is not accepted because of violate the constraint -> Range <0, 59>. Try again.")
-                continue
-
-            if minutes in cls.minutes:
-                click.echo("Input already exists in the database.")
+                click.echo("The input is not accepted because of violate the constraint -> Range <0, 59>. Try again.")
                 continue
 
             if len(minutes) == 1:
                 minutes = "0" + minutes
 
-            query = """UPDATE users SET minutes = ARRAY_APPEND(minutes, %s) WHERE email = %s;"""
+            remove_or_append = "REMOVE" if minutes in cls.minutes else "APPEND"
+
+            query = f"""UPDATE users SET minutes = ARRAY_{remove_or_append}(minutes, %s) WHERE email = %s;"""
 
             params = (minutes, cls.email)
             db.execute_query(query, params, "UPDATE")
 
-            index_to_insert = bisect.bisect_left(cls.minutes, minutes)
-            cls.minutes.insert(index_to_insert, minutes)
+            if remove_or_append == "APPEND":
+                index_to_insert = bisect.bisect_left(cls.minutes, minutes)
+                cls.minutes.insert(index_to_insert, minutes)
+
+            else:
+                cls.minutes.remove(minutes)
 
             click.echo(f"Minutes: {cls.minutes}")
-
-
 
     @classmethod
     def interface(cls):
@@ -134,7 +155,6 @@ class SetupHub:
             cls.cities.remove(city)
 
         cls.interface()
-
 
     @classmethod
     def add_city(cls, city):

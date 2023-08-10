@@ -15,7 +15,7 @@ def create_notification(response, city):
     notification.attributes("-topmost", True)
     notification.after(5000, notification.destroy)
 
-    city_name_label = tk.Label(notification, text=city, font=("Helvetica", 16, "bold"))
+    city_name_label = tk.Label(notification, text=city.capitalize(), font=("Helvetica", 16, "bold"))
     temperature_label = tk.Label(notification, text=f"{str(response['main']['temp'])}°C",
                                  font=("Helvetica", 12))
     weather_label = tk.Label(notification, text=response['weather'][0]['description'].capitalize(),
