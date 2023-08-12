@@ -54,11 +54,8 @@ class DatabaseConnection:
             elif operation_type == "UPDATE":
                 return True
 
-
-
         except psycopg2.Error as e:
             print(f"Error executing query: {e}")
-
 
     def close(self):
         if self.connection:

@@ -1,16 +1,6 @@
 import bcrypt
 import re
 
-def is_valid_email(email):
-    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(pattern, email) is not None
-
-
-def is_valid_password(password):
-    pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
-    return re.match(pattern, password) is not None
-
-
 def hash_password(password):
 
     password_bytes = password.encode('utf-8')
@@ -18,7 +8,6 @@ def hash_password(password):
     hashed_password = bcrypt.hashpw(password_bytes, salt)
 
     return hashed_password, salt
-
 
 def verify_login(entered_password, stored_hashed_password, stored_salt):
 
@@ -31,3 +20,13 @@ def verify_login(entered_password, stored_hashed_password, stored_salt):
     hashed_input = hashed_input.hex()
 
     return hashed_input == stored_hashed_password
+
+
+def is_valid_email(email):
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
+
+def is_valid_password(password):
+    pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+    return re.match(pattern, password) is not None

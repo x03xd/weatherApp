@@ -8,19 +8,31 @@ import click
 
 
 class HourlyScheduler:
-    email = None
+    def __init__(self):
+        self.email = get_credentials()[0]
 
-    @classmethod
-    def get_request(cls):
+    def fetch_timer_by_user__email_and_hour(self, hour):
+        query = """SELECT cities FROM timers WHERE user_email = %s AND hour = %s"""
+        params = (self.email, hour)
+        result = db.execute_query(query, params)
+
+        return result
+
+    def fetch_user_by_email(self):
+        query = """SELECT minutes FROM users WHERE email = %s"""
+        params = (self.email,)
+
+        result = db.execute_query(query, params)
+
+        return result
+
+    def get_request(self):
         key = "f28885ea1b07d58b3b777554dc61e2e0"
         hour = time.strftime("%H")
 
-        query = """SELECT cities FROM timers WHERE user_email = %s AND hour = %s"""
-        params = (cls.email, hour)
+        status, cities = self.fetch_timer_by_user__email_and_hour(hour)
 
-        result, cities = db.execute_query(query, params)
-
-        if result:
+        if status:
             for city in cities[0]:
                 url = f"http://api.openweathermap.org/data/2.5/weather?appid={key}&q={city}&units=metric"
 
@@ -35,21 +47,13 @@ class HourlyScheduler:
         else:
             click.echo("There are no cities for current hour")
 
-    @classmethod
-    def run(cls):
-        cls.email = get_credentials()[0]
-
-        query = """SELECT minutes FROM users WHERE email = %s"""
-        params = (cls.email,)
-
-        result, minutes = db.execute_query(query, params)
+    def run(self):
+        result, minutes = self.fetch_user_by_email()
 
         for minute_timer in minutes[0]:
-            schedule.every().hour.at(f":{minute_timer}").do(cls.get_request)
+            schedule.every().hour.at(f":{minute_timer}").do(self.get_request)
 
         while True:
             schedule.run_pending()
             time.sleep(1)
 
-if __name__ == "__main__":
-    HourlyScheduler().get_request()
