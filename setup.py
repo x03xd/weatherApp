@@ -3,7 +3,6 @@ from data_text import get_credentials
 from database_connection import db
 import bisect
 
-
 class SetupHubQueries:
     def __init__(self):
         self.email = get_credentials()[0]
@@ -56,7 +55,6 @@ class SetupHubQueries:
 
 
 class SetupHub(SetupHubQueries):
-
     def setup(self):
         click.echo("Welcome to the setup menu!")
 
@@ -110,7 +108,6 @@ class SetupHub(SetupHubQueries):
         if 0 > int(minutes) > 60:
             click.echo("The input is not accepted because of violate the constraint -> Range <0, 59>. Try again.")
             return False
-
 
     def minutes_method(self):
         self.fetch_user_by_email_ordered()
@@ -175,9 +172,4 @@ class SetupHub(SetupHubQueries):
             self.cities.append(city)
 
         self.city_interface()
-
-
-if __name__ == "__main__":
-    setup = SetupHub()
-
 

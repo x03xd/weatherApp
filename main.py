@@ -3,6 +3,8 @@ from authentication import Authentication
 from data_text import is_user_logged
 from main2 import setup_or_run
 @click.command()
+
+
 def main():
     click.echo("Welcome to the program!")
 

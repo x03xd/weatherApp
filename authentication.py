@@ -15,7 +15,7 @@ class Authentication:
 
     @staticmethod
     def create_new_user(email, hashed_password, salt):
-        new_user = """INSERT INTO users(email, password, salt) VALUES (%s, %s, %s)"""
+        new_user = "INSERT INTO users(email, password, salt) VALUES (%s, %s, %s)"
 
         params = (email, hashed_password, salt)
         new_user_creation_result = db.execute_query(new_user, params, "INSERT")

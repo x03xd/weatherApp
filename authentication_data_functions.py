@@ -9,6 +9,7 @@ def hash_password(password):
 
     return hashed_password, salt
 
+
 def verify_login(entered_password, stored_hashed_password, stored_salt):
 
     if isinstance(stored_salt, memoryview):
