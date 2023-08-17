@@ -6,8 +6,8 @@ from common_query_utility import SelectQueryUtility, InsertQueryUtility
 
 class Authentication:
     def __init__(self):
-        self.select_query_utility = SelectQueryUtility()
-        self.insert_query_utility = InsertQueryUtility()
+        self.select_query_utility = SelectQueryUtility(self.email)
+        self.insert_query_utility = InsertQueryUtility(self.email)
 
     def login(self):
         click.echo("You selected Login.")

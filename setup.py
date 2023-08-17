@@ -10,9 +10,9 @@ class SetupHub():
         self.cities = None
         self.hour = None
 
-        self.select_query_utility = SelectQueryUtility()
-        self.insert_query_utility = InsertQueryUtility()
-        self.update_query_utility = UpdateQueryUtility()
+        self.select_query_utility = SelectQueryUtility(self.email)
+        self.insert_query_utility = InsertQueryUtility(self.email)
+        self.update_query_utility = UpdateQueryUtility(self.email)
 
     def setup(self):
         click.echo("Welcome to the setup menu!")
@@ -42,7 +42,7 @@ class SetupHub():
                 break
             else:
                 click.echo("Invalid choice. Please try again.")
-                
+
     def hours(self):
         while True:
             hour = click.prompt("Please enter an hour", type=str)
@@ -117,13 +117,13 @@ class SetupHub():
                 else:
                     self.add_city(city)
 
-    def __remove_city(self, city):
+    def remove_city(self, city):
         if city in self.cities:
             self.update_query_utility.update_timer_city(city, "REMOVE", self.email, self.hour)
             self.cities.remove(city)
         self.city_interface()
 
-    def __add_city(self, city):
+    def add_city(self, city):
         if city in self.cities:
             click.echo("Given city is already in your choices")
         else:

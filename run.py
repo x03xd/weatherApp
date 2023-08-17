@@ -9,7 +9,7 @@ from common_query_utility import SelectQueryUtility
 class HourlyScheduler:
     def __init__(self):
         self.email = get_credentials()[0]
-        self.select_query_utility = SelectQueryUtility()
+        self.select_query_utility = SelectQueryUtility(self.email)
 
     def get_request(self):
         key = "f28885ea1b07d58b3b777554dc61e2e0"
