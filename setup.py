@@ -1,60 +1,19 @@
 import click
 from data_text import get_credentials
-from database_connection import db
 import bisect
+from common_query_utility import SelectQueryUtility, InsertQueryUtility, UpdateQueryUtility
 
-class SetupHubQueries:
+class SetupHub():
     def __init__(self):
         self.email = get_credentials()[0]
         self.minutes = []
         self.cities = None
         self.hour = None
 
-    def restart_cities(self):
-        query = """UPDATE timers SET cities = '{}' WHERE user_email = %s;"""
-        params = (self.email,)
-        db.execute_query(query, params, "UPDATE")
-        click.echo("Cities have been removed.")
+        self.select_query_utility = SelectQueryUtility()
+        self.insert_query_utility = InsertQueryUtility()
+        self.update_query_utility = UpdateQueryUtility()
 
-    def restart_minutes_timers(self):
-        query = """UPDATE users SET minutes = '{}' WHERE email = %s;"""
-        params = (self.email,)
-        db.execute_query(query, params, "UPDATE")
-        click.echo("Minutes timers have been removed.")
-
-    def create_new_timer(self):
-        query_insert = """INSERT INTO timers(hour, user_email, cities) VALUES(%s, %s, %s);"""
-        params_insert = (self.hour, self.email, [])
-        db.execute_query(query_insert, params_insert, "INSERT")
-
-    def fetch_timer_by_user__email_hour(self):
-        query = """SELECT cities FROM timers WHERE user_email = %s AND hour = %s"""
-        params = (self.email, self.hour)
-        result = db.execute_query(query, params, "SELECT")
-
-        return result
-
-    def fetch_user_by_email_ordered(self):
-        query = """SELECT minutes FROM users WHERE email = %s ORDER BY minutes;"""
-        params = (self.email,)
-
-        result, minutes_array = db.execute_query(query, params, "SELECT")
-        self.minutes = minutes_array[0]
-
-    def update_user_minutes(self, operation, minutes):
-        query = f"""UPDATE users SET minutes = ARRAY_{operation}(minutes, %s) WHERE email = %s;"""
-
-        params = (minutes, self.email)
-        db.execute_query(query, params, "UPDATE")
-
-    def update_timer_city(self, city, operation):
-        query = f"""UPDATE timers SET cities = ARRAY_{operation}(cities, %s) WHERE user_email = %s AND hour = %s;"""
-        params = (city, self.email, self.hour)
-
-        db.execute_query(query, params, "UPDATE")
-
-
-class SetupHub(SetupHubQueries):
     def setup(self):
         click.echo("Welcome to the setup menu!")
 
@@ -73,15 +32,17 @@ class SetupHub(SetupHubQueries):
             elif choice == 2:
                 self.minutes_method()
             elif choice == 3:
-                self.restart_cities()
+                self.update_query_utility.restart_cities(self.email)
+                click.echo("Cities have been removed.")
             elif choice == 4:
-                self.restart_minutes_timers()
+                self.update_query_utility.restart_minutes_timers(self.email)
+                click.echo("Minutes timers have been removed.")
             elif choice == 5:
                 click.echo("Exiting the program. Goodbye!")
                 break
             else:
                 click.echo("Invalid choice. Please try again.")
-
+                
     def hours(self):
         while True:
             hour = click.prompt("Please enter an hour", type=str)
@@ -91,10 +52,10 @@ class SetupHub(SetupHubQueries):
                 click.echo("The input must have range <0, 23>")
                 continue
 
-            result, record = self.fetch_timer_by_user__email_hour()
+            result, record = self.select_query_utility.fetch_timer_by_user__email_hour(self.email, self.hour)
 
             if record is None:
-                self.create_new_timer()
+                self.insert_query_utility.create_new_timer(self.hour, self.email)
 
             self.cities = record[0] if record is not None else []
             self.city_interface()
@@ -110,7 +71,9 @@ class SetupHub(SetupHubQueries):
             return False
 
     def minutes_method(self):
-        self.fetch_user_by_email_ordered()
+        result, minutes_array = self.select_query_utility.fetch_user_by_email(self.email, "minutes", " ORDER BY minutes;")
+        self.minutes = minutes_array[0]
+
         click.echo(f"Minutes: {self.minutes}")
 
         while True:
@@ -124,12 +87,11 @@ class SetupHub(SetupHubQueries):
                 minutes = "0" + minutes
 
             operation = "REMOVE" if minutes in self.minutes else "APPEND"
-            self.update_user_minutes(operation, minutes)
+            self.update_query_utility.update_user_minutes(operation, minutes, self.email)
 
             if operation == "APPEND":
                 index_to_insert = bisect.bisect_left(self.minutes, minutes)
                 self.minutes.insert(index_to_insert, minutes)
-
             else:
                 self.minutes.remove(minutes)
 
@@ -147,29 +109,25 @@ class SetupHub(SetupHubQueries):
 
             if city in self.cities:
                 self.remove_city(city)
-
             else:
                 cities_length = len(self.cities)
 
                 if cities_length >= 3:
                     click.echo("You cannot add new city (limit equals 3)")
-
                 else:
                     self.add_city(city)
 
-    def remove_city(self, city):
+    def __remove_city(self, city):
         if city in self.cities:
-            self.update_timer_city(city, "REMOVE")
+            self.update_query_utility.update_timer_city(city, "REMOVE", self.email, self.hour)
             self.cities.remove(city)
-
         self.city_interface()
 
-    def add_city(self, city):
+    def __add_city(self, city):
         if city in self.cities:
             click.echo("Given city is already in your choices")
         else:
-            self.update_timer_city(city, "APPEND")
+            self.update_query_utility.update_timer_city(city, "APPEND", self.email, self.hour)
             self.cities.append(city)
-
         self.city_interface()
 

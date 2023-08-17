@@ -1,34 +1,20 @@
 import click
-from database_connection import db
 from authentication_data_functions import hash_password, verify_login, is_valid_email, is_valid_password
 from main2 import setup_or_run
 from data_text import save_user_to_file
+from common_query_utility import SelectQueryUtility, InsertQueryUtility
 
 class Authentication:
-    @staticmethod
-    def fetch_user_by_email(email):
-        query = """SELECT * FROM users WHERE email = %s;"""
-        params = (email,)
-        result = db.execute_query(query, params)
+    def __init__(self):
+        self.select_query_utility = SelectQueryUtility()
+        self.insert_query_utility = InsertQueryUtility()
 
-        return result
-
-    @staticmethod
-    def create_new_user(email, hashed_password, salt):
-        new_user = "INSERT INTO users(email, password, salt) VALUES (%s, %s, %s)"
-
-        params = (email, hashed_password, salt)
-        new_user_creation_result = db.execute_query(new_user, params, "INSERT")
-
-        return new_user_creation_result
-
-    @staticmethod
-    def login():
+    def login(self):
         click.echo("You selected Login.")
 
         while True:
             email = click.prompt("Please enter your email", type=str)
-            result, record = Authentication.fetch_user_by_email(email)
+            result, record = self.select_query_utility.fetch_user_by_email(email, "*")
 
             if not result:
                 click.echo("User with given email does not exist. Try again")
@@ -45,8 +31,7 @@ class Authentication:
             else:
                 click.echo("The User does not exist")
 
-    @staticmethod
-    def register():
+    def register(self):
         click.echo("You selected Register.")
 
         while True:
@@ -57,7 +42,7 @@ class Authentication:
                 click.echo("Email has wrong structure")
                 continue
 
-            result, record = Authentication.fetch_user_by_email(email)
+            result, record = self.select_query_utility.fetch_user_by_email(email, "*")
 
             if result:
                 click.echo("Email with that email already exists")
@@ -80,7 +65,7 @@ class Authentication:
             hashed_password, salt = hash_password(password)
             hashed_password = hashed_password.hex()
 
-            new_user_creation_result = Authentication.create_new_user(email, hashed_password, salt)
+            new_user_creation_result = self.insert_query_utility.create_new_user(email, hashed_password, salt)
 
             if new_user_creation_result:
                 click.echo("New user has been created")

@@ -1,36 +1,21 @@
 from data_text import get_credentials
-from database_connection import db
 import requests
 import schedule
 import time
 from window import create_notification
 import click
-
+from common_query_utility import SelectQueryUtility
 
 class HourlyScheduler:
     def __init__(self):
         self.email = get_credentials()[0]
-
-    def fetch_timer_by_user__email_and_hour(self, hour):
-        query = """SELECT cities FROM timers WHERE user_email = %s AND hour = %s"""
-        params = (self.email, hour)
-        result = db.execute_query(query, params)
-
-        return result
-
-    def fetch_user_by_email(self):
-        query = """SELECT minutes FROM users WHERE email = %s"""
-        params = (self.email,)
-
-        result = db.execute_query(query, params)
-
-        return result
+        self.select_query_utility = SelectQueryUtility()
 
     def get_request(self):
         key = "f28885ea1b07d58b3b777554dc61e2e0"
         hour = time.strftime("%H")
 
-        status, cities = self.fetch_timer_by_user__email_and_hour(hour)
+        status, cities = self.select_query_utility.fetch_timer_by_user__email_and_hour(self.email, hour)
 
         if status:
             for city in cities[0]:
@@ -48,7 +33,7 @@ class HourlyScheduler:
             click.echo("There are no cities for current hour")
 
     def run(self):
-        result, minutes = self.fetch_user_by_email()
+        result, minutes = self.select_query_utility.fetch_user_by_email(self.email, "minutes")
 
         for minute_timer in minutes[0]:
             schedule.every().hour.at(f":{minute_timer}").do(self.get_request)
@@ -56,4 +41,5 @@ class HourlyScheduler:
         while True:
             schedule.run_pending()
             time.sleep(1)
+
 
