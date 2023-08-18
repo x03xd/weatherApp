@@ -6,15 +6,18 @@ from common_query_utility import SelectQueryUtility, InsertQueryUtility
 
 class Authentication:
     def __init__(self):
-        self.select_query_utility = SelectQueryUtility(self.email)
-        self.insert_query_utility = InsertQueryUtility(self.email)
+        self.select_query_utility = SelectQueryUtility(None)
+        self.insert_query_utility = InsertQueryUtility(None)
 
     def login(self):
         click.echo("You selected Login.")
 
         while True:
             email = click.prompt("Please enter your email", type=str)
-            result, record = self.select_query_utility.fetch_user_by_email(email, "*")
+            self.select_query_utility.email = email
+            self.insert_query_utility.email = email
+
+            result, record = self.select_query_utility.fetch_user_by_email("*")
 
             if not result:
                 click.echo("User with given email does not exist. Try again")
@@ -36,13 +39,16 @@ class Authentication:
 
         while True:
             email = click.prompt("Please enter your email", type=str)
+            self.select_query_utility.email = email
+            self.insert_query_utility.email = email
+
             email_validation = is_valid_email(email)
 
             if not email_validation:
                 click.echo("Email has wrong structure")
                 continue
 
-            result, record = self.select_query_utility.fetch_user_by_email(email, "*")
+            result, record = self.select_query_utility.fetch_user_by_email("*")
 
             if result:
                 click.echo("Email with that email already exists")
@@ -65,7 +71,7 @@ class Authentication:
             hashed_password, salt = hash_password(password)
             hashed_password = hashed_password.hex()
 
-            new_user_creation_result = self.insert_query_utility.create_new_user(email, hashed_password, salt)
+            new_user_creation_result = self.insert_query_utility.create_new_user(hashed_password, salt)
 
             if new_user_creation_result:
                 click.echo("New user has been created")

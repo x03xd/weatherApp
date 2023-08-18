@@ -22,7 +22,6 @@ def verify_login(entered_password, stored_hashed_password, stored_salt):
 
     return hashed_input == stored_hashed_password
 
-
 def is_valid_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None

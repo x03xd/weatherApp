@@ -1,14 +1,17 @@
 import click
 from authentication import Authentication
-from data_text import is_user_logged
 from main2 import setup_or_run
+from common_query_utility import SelectQueryUtility
+from data_text import read_credentials
 
 @click.command()
 def main():
     click.echo("Welcome to the program!")
+    authentication = Authentication()
 
     while True:
-        if is_user_logged():
+        credentials = read_credentials()
+        if SelectQueryUtility.is_user_logged(credentials):
             setup_or_run()
 
         click.echo("\nPlease select an option:")
@@ -19,9 +22,9 @@ def main():
         choice = click.prompt("Enter your choice", type=int)
 
         if choice == 1:
-            Authentication.login()
+            authentication.login()
         elif choice == 2:
-            Authentication.register()
+            authentication.register()
         elif choice == 3:
             click.echo("Exiting the program. Goodbye!")
             break

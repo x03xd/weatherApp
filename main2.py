@@ -29,7 +29,6 @@ def setup_or_run():
         else:
             click.echo("Invalid choice. Please try again.")
 
-
 def logout():
     with open('weatherApp_auth_data', 'r+') as file:
         file.truncate()

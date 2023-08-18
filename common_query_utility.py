@@ -6,13 +6,11 @@ class AbstractUtilityCategory(ABC):
         self.email = email
 
 class SelectQueryUtility(AbstractUtilityCategory):
-
     def fetch_timer_by_user__email_and_hour(self, hour):
         query = """SELECT cities FROM timers WHERE user_email = %s AND hour = %s;"""
         params = (self.email, hour)
         result = db.execute_query(query, params)
         return result
-
 
     def fetch_user_by_email(self, columns, rest=""):
         query = f"""SELECT {columns} FROM users WHERE email = %s{rest};"""
@@ -20,10 +18,18 @@ class SelectQueryUtility(AbstractUtilityCategory):
         result = db.execute_query(query, params)
         return result
 
+    @staticmethod
+    def is_user_logged(credentials):
+        if credentials:
+            email, hashed_password = credentials
+            query = """SELECT * FROM users WHERE email = %s AND password = %s"""
+            params = (email, hashed_password)
+            result, record = db.execute_query(query, params, "SELECT")
+            return result
+
 
 
 class UpdateQueryUtility(AbstractUtilityCategory):
-
     def restart_cities(self):
         query = """UPDATE timers SET cities = '{}' WHERE user_email = %s;"""
         params = (self.email,)
@@ -46,7 +52,6 @@ class UpdateQueryUtility(AbstractUtilityCategory):
 
 
 class InsertQueryUtility(AbstractUtilityCategory):
-
     def create_new_user(self, hashed_password, salt):
         new_user = "INSERT INTO users(email, password, salt) VALUES (%s, %s, %s)"
         params = (self.email, hashed_password, salt)
