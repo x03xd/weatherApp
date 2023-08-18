@@ -22,8 +22,6 @@ class HourlyScheduler:
                 url = f"http://api.openweathermap.org/data/2.5/weather?appid={key}&q={city}&units=metric"
                 response = requests.get(url).json()
 
-                print(response)
-
                 if response["cod"] == 200:
                     create_notification(response, city)
                 else:

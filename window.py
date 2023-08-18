@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import PhotoImage
 from urllib.request import urlopen
-
+import click
 
 def create_notification(response, city):
 
@@ -26,13 +26,18 @@ def create_notification(response, city):
     weather_label.pack(pady=(0, 10))
 
     img_url = f"http://openweathermap.org/img/w/{response['weather'][0]['icon']}.png"
-    u = urlopen(img_url)
-    raw_data = u.read()
-    u.close()
 
-    photo = PhotoImage(data=raw_data)
-    image_label = tk.Label(notification, image=photo)
-    image_label.image = photo
-    image_label.pack()
+    try:
+        u = urlopen(img_url)
+        raw_data = u.read()
+        u.close()
+
+        photo = PhotoImage(data=raw_data)
+        image_label = tk.Label(notification, image=photo)
+        image_label.image = photo
+        image_label.pack()
+
+    except Exception as img_error:
+        click.echo(f"Error loading image: {img_error}")
 
     notification.mainloop()
