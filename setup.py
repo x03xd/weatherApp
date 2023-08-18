@@ -31,10 +31,10 @@ class SetupHub():
             elif choice == 2:
                 self._minutes_method()
             elif choice == 3:
-                self._update_query_utility.restart_cities()
+                self.update_query_utility.restart_cities()
                 click.echo("Cities have been removed.")
             elif choice == 4:
-                self._update_query_utility.restart_minutes_timers()
+                self.update_query_utility.restart_minutes_timers()
                 click.echo("Minutes timers have been removed.")
             elif choice == 5:
                 click.echo("Exiting the program. Goodbye!")
@@ -65,7 +65,7 @@ class SetupHub():
             click.echo("The input is not accepted because of characters other than numbers. Try again.")
             return False
 
-        if 0 > int(minute) > 60:
+        if not (0 <= int(minute) <= 59):
             click.echo("The input is not accepted because of violate the constraint -> Range <0, 59>. Try again.")
             return False
 

@@ -61,7 +61,7 @@ class InsertQueryUtility(AbstractUtilityCategory):
     def create_new_timer(self, hour):
         query_insert = """INSERT INTO timers(hour, user_email, cities) VALUES(%s, %s, %s);"""
         params_insert = (hour, self.email, [])
-        db.execute_query(query_insert, params_insert, "INSERT")
-
+        new_user_creation_result = db.execute_query(query_insert, params_insert, "INSERT")
+        return new_user_creation_result
 
 
