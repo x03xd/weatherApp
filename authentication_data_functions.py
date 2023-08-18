@@ -2,7 +2,6 @@ import bcrypt
 import re
 
 def hash_password(password):
-
     password_bytes = password.encode('utf-8')
     salt = bcrypt.gensalt()
     hashed_password = bcrypt.hashpw(password_bytes, salt)
@@ -11,7 +10,6 @@ def hash_password(password):
 
 
 def verify_login(entered_password, stored_hashed_password, stored_salt):
-
     if isinstance(stored_salt, memoryview):
         stored_salt = stored_salt.tobytes()
 

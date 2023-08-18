@@ -27,14 +27,14 @@ class SetupHub():
             choice = click.prompt("Enter your choice", type=int)
 
             if choice == 1:
-                self.hours()
+                self._hours()
             elif choice == 2:
-                self.minutes_method()
+                self._minutes_method()
             elif choice == 3:
-                self.update_query_utility.restart_cities()
+                self._update_query_utility.restart_cities()
                 click.echo("Cities have been removed.")
             elif choice == 4:
-                self.update_query_utility.restart_minutes_timers()
+                self._update_query_utility.restart_minutes_timers()
                 click.echo("Minutes timers have been removed.")
             elif choice == 5:
                 click.echo("Exiting the program. Goodbye!")
@@ -42,7 +42,7 @@ class SetupHub():
             else:
                 click.echo("Invalid choice. Please try again.")
 
-    def hours(self):
+    def _hours(self):
         while True:
             hour = click.prompt("Please enter an hour", type=str)
             self.hour = hour
@@ -57,10 +57,10 @@ class SetupHub():
                 self.insert_query_utility.create_new_timer(self.hour)
 
             self.cities = record[0] if record is not None else []
-            self.city_interface()
+            self._city_interface()
 
     @staticmethod
-    def validate_minutes_method(minute):
+    def _validate_minutes_method(minute):
         if not minute.isdigit() or len(minute) > 2 or len(minute) == 0:
             click.echo("The input is not accepted because of characters other than numbers. Try again.")
             return False
@@ -71,7 +71,7 @@ class SetupHub():
 
         return True
 
-    def minutes_method(self):
+    def _minutes_method(self):
         result, minutes_array = self.select_query_utility.fetch_user_by_email("minutes", " ORDER BY minutes")
         self.minutes = minutes_array[0]
 
@@ -81,7 +81,7 @@ class SetupHub():
             minute = click.prompt("Add minute timer in which the notification should be displayed."
                                    " Range <0, 59>. If it already exists, it will be removed", type=str)
 
-            if not SetupHub.validate_minutes_method(minute):
+            if not SetupHub._validate_minutes_method(minute):
                 continue
 
             if len(minute) == 1:
@@ -98,7 +98,7 @@ class SetupHub():
 
             click.echo(f"Minutes: {self.minutes}")
 
-    def city_interface(self):
+    def _city_interface(self):
         click.echo("You can either provide new city typing its name or remove existing doing the same things"
                    "If you provide not existing city you will receive info about this in the console while good ones will be shown")
 
@@ -109,26 +109,26 @@ class SetupHub():
             city = city.lower()
 
             if city in self.cities:
-                self.remove_city(city)
+                self._remove_city(city)
             else:
                 cities_length = len(self.cities)
 
                 if cities_length >= 3:
                     click.echo("You cannot add new city (limit equals 3)")
                 else:
-                    self.add_city(city)
+                    self._add_city(city)
 
-    def remove_city(self, city):
+    def _remove_city(self, city):
         if city in self.cities:
             self.update_query_utility.update_timer_city(city, "REMOVE", self.hour)
             self.cities.remove(city)
-        self.city_interface()
+        self._city_interface()
 
-    def add_city(self, city):
+    def _add_city(self, city):
         if city in self.cities:
             click.echo("Given city is already in your choices")
         else:
             self.update_query_utility.update_timer_city(city, "APPEND", self.hour)
             self.cities.append(city)
-        self.city_interface()
+        self._city_interface()
 

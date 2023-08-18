@@ -11,7 +11,7 @@ class HourlyScheduler:
         self.email = get_credentials()[0]
         self.select_query_utility = SelectQueryUtility(self.email)
 
-    def get_request(self):
+    def _get_request(self):
         key = "f28885ea1b07d58b3b777554dc61e2e0"
         hour = time.strftime("%H")
 
@@ -34,7 +34,7 @@ class HourlyScheduler:
         result, minutes = self.select_query_utility.fetch_user_by_email("minutes")
 
         for minute_timer in minutes[0]:
-            schedule.every().hour.at(f":{minute_timer}").do(self.get_request)
+            schedule.every().hour.at(f":{minute_timer}").do(self._get_request)
 
         while True:
             schedule.run_pending()
