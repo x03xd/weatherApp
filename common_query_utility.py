@@ -28,7 +28,6 @@ class SelectQueryUtility(AbstractUtilityCategory):
             return result
 
 
-
 class UpdateQueryUtility(AbstractUtilityCategory):
     def restart_cities(self):
         query = """UPDATE timers SET cities = '{}' WHERE user_email = %s;"""
@@ -49,6 +48,8 @@ class UpdateQueryUtility(AbstractUtilityCategory):
         query = f"""UPDATE timers SET cities = ARRAY_{operation}(cities, %s) WHERE user_email = %s AND hour = %s;"""
         params = (city, self.email, hour)
         db.execute_query(query, params, "UPDATE")
+
+
 
 
 class InsertQueryUtility(AbstractUtilityCategory):

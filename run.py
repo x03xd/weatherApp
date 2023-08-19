@@ -20,10 +20,11 @@ class HourlyScheduler:
         if status:
             for city in cities[0]:
                 url = f"http://api.openweathermap.org/data/2.5/weather?appid={key}&q={city}&units=metric"
-                response = requests.get(url).json()
+                response = requests.get(url)
+                response_json = response.json()
 
-                if response["cod"] == 200:
-                    create_notification(response, city)
+                if response_json["cod"] == 200:
+                    create_notification(response_json, city)
                 else:
                     click.echo(f"Error fetching weather data for {city}")
 

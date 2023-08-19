@@ -19,7 +19,10 @@ def test_fetch_user_by_email(mock_execute_query):
     instance = SelectQueryUtility("user@example.com")
     result = instance.fetch_user_by_email("*")
 
-    mock_execute_query.assert_called_once()
+    query = f"""SELECT * FROM users WHERE email = %s;"""
+    params = ("user@example.com",)
+
+    mock_execute_query.assert_called_once_with(query, params)
     assert result == mock_result
 
 def test_fetch_timer_by_user__email_and_hour(mock_execute_query):
@@ -29,25 +32,33 @@ def test_fetch_timer_by_user__email_and_hour(mock_execute_query):
     instance = SelectQueryUtility("user@example.com")
     result = instance.fetch_timer_by_user__email_and_hour("10")
 
-    mock_execute_query.assert_called_once()
-    assert result == mock_result
+    query = """SELECT cities FROM timers WHERE user_email = %s AND hour = %s;"""
+    params = ("user@example.com", "10")
 
+    mock_execute_query.assert_called_once_with(query, params)
+    assert result == mock_result
 
 def test_is_user_logged_valid_credentials(mock_execute_query):
     mock_execute_query.return_value = [True, (2, "user@example.com", "hashed_password", "salt", "minutes_array")]
     result = SelectQueryUtility.is_user_logged(('test@example.com', 'hashed_password'))
-    mock_execute_query.assert_called_once()
+
+    query = """SELECT * FROM users WHERE email = %s AND password = %s"""
+    params = ("test@example.com", "hashed_password")
+    mock_execute_query.assert_called_once_with(query, params, "SELECT")
 
     assert result is True
 
 def test_is_user_logged_invalid_credentials(mock_execute_query):
     mock_execute_query.return_value = (False, None)
-    result = SelectQueryUtility.is_user_logged(('invalid@example.com', 'invalid_hashed_password'))
-    mock_execute_query.assert_called_once()
+    result = SelectQueryUtility.is_user_logged(('test@example.com', 'hashed_password'))
+
+    query = """SELECT * FROM users WHERE email = %s AND password = %s"""
+    params = ("test@example.com", "hashed_password")
+    mock_execute_query.assert_called_once_with(query, params, "SELECT")
 
     assert result is False
 
-
+'''UPDATE --- UPDATE --- UPDATE --- UPDATE --- UPDATE'''
 
 def test_restart_cities(mock_execute_query):
     instance = UpdateQueryUtility("user@example.com")
@@ -86,25 +97,28 @@ def test_update_timer_city(mock_execute_query, operation):
     mock_execute_query.assert_called_once_with(query, params, "UPDATE")
 
 
+'''INSERT --- INSERT --- INSERT --- INSERT --- INSERT'''
 
+def test_create_new_user(mock_execute_query):
 
+    instance = InsertQueryUtility("user@example.com")
+    instance.create_new_user("hashed_password", "salt")
 
+    query = "INSERT INTO users(email, password, salt) VALUES (%s, %s, %s)"
+    params = ("user@example.com", "hashed_password", "salt")
 
+    mock_execute_query.assert_called_once_with(query, params, "INSERT")
 
 
 def test_create_new_timer(mock_execute_query):
-    mock_execute_query.return_value = True
 
     instance = InsertQueryUtility("user@example.com")
-    result = instance.create_new_timer("10")
+    instance.create_new_timer("10")
 
-    mock_execute_query.assert_called_once()
+    query = """INSERT INTO timers(hour, user_email, cities) VALUES(%s, %s, %s);"""
+    params = ("10", "user@example.com", [])
+
+    mock_execute_query.assert_called_once_with(query, params, "INSERT")
 
 
-'''def test_restart_cities(mock_execute_query):
-    mock_execute_query
 
-    expected_query = """UPDATE timers SET cities = '{}' WHERE user_email = %s;"""
-    expected_params = ("test@example.com",)
-    mock_execute_query.assert_called_once_with(expected_query, expected_params, "UPDATE")
-'''
