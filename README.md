@@ -1,11 +1,19 @@
-# weatherApp
 
-APLIKACJA KONSOLOWA POZWALAJĄCA WYŚWIETLIĆ PO URUCHOMIENIU DANE POGODOWE MIAST WYBRANYCH PRZEZ USERA.
+<h1>Aplikacja Pogodowa</h1>
 
-FEATURY:
-1. REJESTRACJA
-2. LOGIN W OPARCIU O ZAPISANE DANE Z PLIKU TEKSTOWEGO
-3. LOGOUT
-4. PERSONALIZOWANIE MIAST DO WYŚWIETLENIA O KONKRETNEJ GODZINIE
-5. DOBRANIE MINUT WYŚWIETLENIA
-6. UNITTESTY DLA NIEKTÓRYCH FUNKCJONALNOŚCI
+<h2>Funkcje:</h2>
+<ul>
+    <li>Rejestracja</li>
+    <li>Login w oparciu o zapisane dane z pliku tekstowego</li>
+    <li>Logout</li>
+    <li>Personalizowanie miast do wyświetlenia o konkretnej godzinie</li>
+    <li>Dobieranie minut wyświetlenia</li>
+    <li>Unit testy dla niektórych funkcjonalności</li>
+</ul>
+
+<h2>API</h2>
+<ul>
+  <li>
+    <a href = "https://openweathermap.org/api">OpenWeatherMap</a>
+  </li>
+</ul>
