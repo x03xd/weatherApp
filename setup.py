@@ -72,7 +72,7 @@ class SetupHub():
         return True
 
     def _minutes_method(self):
-        result, minutes_array = self.select_query_utility.fetch_user_by_email("minutes", " ORDER BY minutes")
+        _, minutes_array = self.select_query_utility.fetch_user_by_email("minutes", " ORDER BY minutes")
         self.minutes = minutes_array[0]
 
         click.echo(f"Minutes: {self.minutes}")

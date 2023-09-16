@@ -5,6 +5,9 @@ import time
 from window import create_notification
 import click
 from common_query_utility import SelectQueryUtility
+import os
+from dotenv import main
+main.load_dotenv()
 
 class HourlyScheduler:
     def __init__(self):
@@ -12,14 +15,14 @@ class HourlyScheduler:
         self.select_query_utility = SelectQueryUtility(self.email)
 
     def _get_request(self):
-        key = "f28885ea1b07d58b3b777554dc61e2e0"
+        api_key = os.getenv('API_KEY')
         hour = time.strftime("%H")
 
         status, cities = self.select_query_utility.fetch_timer_by_user__email_and_hour(hour)
 
         if status:
             for city in cities[0]:
-                url = f"http://api.openweathermap.org/data/2.5/weather?appid={key}&q={city}&units=metric"
+                url = f"http://api.openweathermap.org/data/2.5/weather?appid={api_key}&q={city}&units=metric"
                 response = requests.get(url)
                 response_json = response.json()
 
@@ -32,7 +35,7 @@ class HourlyScheduler:
             click.echo("There are no cities for current hour")
 
     def run(self):
-        result, minutes = self.select_query_utility.fetch_user_by_email("minutes")
+        _, minutes = self.select_query_utility.fetch_user_by_email("minutes")
 
         for minute_timer in minutes[0]:
             schedule.every().hour.at(f":{minute_timer}").do(self._get_request)

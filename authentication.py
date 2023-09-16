@@ -8,7 +8,6 @@ class Authentication:
     def __init__(self):
         self.select_query_utility = SelectQueryUtility(None)
         self.insert_query_utility = InsertQueryUtility(None)
-
     def login(self):
         click.echo("You selected Login.")
 
@@ -48,7 +47,7 @@ class Authentication:
                 click.echo("Email has wrong structure")
                 continue
 
-            result, record = self.select_query_utility.fetch_user_by_email("*")
+            result, _ = self.select_query_utility.fetch_user_by_email("*")
 
             if result:
                 click.echo("Email with that email already exists")
