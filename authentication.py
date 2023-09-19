@@ -8,6 +8,7 @@ class Authentication:
     def __init__(self):
         self.select_query_utility = SelectQueryUtility(None)
         self.insert_query_utility = InsertQueryUtility(None)
+
     def login(self):
         click.echo("You selected Login.")
 

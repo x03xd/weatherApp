@@ -13,5 +13,8 @@ def read_credentials():
     return credentials
 
 def get_credentials():
-    read = read_credentials()
-    return read_credentials() if SelectQueryUtility.is_user_logged(read) else None
+    credentials = read_credentials()
+    return credentials if SelectQueryUtility.is_user_logged(credentials) else None
+
+
+

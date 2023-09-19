@@ -1,22 +1,18 @@
 import pytest
 from unittest.mock import patch, Mock
 import sys, os
-
 current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
-
 from run import *
 
-key = "f28885ea1b07d58b3b777554dc61e2e0"
-city = "Warsaw"
 
 @pytest.mark.parametrize("cod", ["404", 200])
 @patch("run.requests.get")
 @patch.object(SelectQueryUtility, 'fetch_timer_by_user__email_and_hour')
 @patch("run.get_credentials")
 @patch("run.create_notification")
-def test__get_request_called(mock_create_notification, mock_get_credentials, mock_select_query, mock_requests_get, cod):
+def test__get_request_called(_, mock_get_credentials, mock_select_query, mock_requests_get, cod):
 
     mocked_credentials = ["mocked_email", "mocked_password"]
     mock_get_credentials.return_value = mocked_credentials

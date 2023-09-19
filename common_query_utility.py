@@ -50,8 +50,6 @@ class UpdateQueryUtility(AbstractUtilityCategory):
         db.execute_query(query, params, "UPDATE")
 
 
-
-
 class InsertQueryUtility(AbstractUtilityCategory):
     def create_new_user(self, hashed_password, salt):
         new_user = "INSERT INTO users(email, password, salt) VALUES (%s, %s, %s)"
