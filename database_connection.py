@@ -1,5 +1,7 @@
 import psycopg2
-import time
+import os
+from dotenv import main
+main.load_dotenv()
 
 class DatabaseConnection:
     __instance = None
@@ -62,6 +64,10 @@ class DatabaseConnection:
             self.connection.close()
 
 
-db = DatabaseConnection("weatherApp", "postgres", "admin")
+DB_NAME = os.getenv('DB_NAME')
+USER = os.getenv('USER')
+PASSWORD = os.getenv('PASSWORD')
+
+db = DatabaseConnection(DB_NAME, USER, PASSWORD)
 db.connect()
 
