@@ -5,7 +5,6 @@ current = os.path.dirname(os.path.realpath(__file__))
 parent = os.path.dirname(current)
 sys.path.append(parent)
 from unittest.mock import patch
-import bcrypt
 from authentication_data_functions import *
 
 passwords = [
@@ -13,7 +12,7 @@ passwords = [
     ("aD!6", False),
     ("v00FG4cfC", False),
     ("5531@#", False),
-    ("zxc!!@123Q", True),
+    ("abcv&&@123B", True),
 ]
 
 emails = [
@@ -23,7 +22,6 @@ emails = [
     ("admin@.pl", False),
     ("admin@o2.pl", True),
 ]
-
 
 @pytest.mark.parametrize("input_, output_", passwords)
 def test_is_valid_password(input_, output_):
